@@ -1,9 +1,12 @@
-const toggle = document.getElementById("toggle");
 
-chrome.storage.sync.get("enabled", (data) => {
-  toggle.checked = data.enabled !== false;
-});
-
-toggle.addEventListener("change", () => {
-  chrome.runtime.sendMessage({ type: "toggle", enabled: toggle.checked });
+document.addEventListener('DOMContentLoaded', () => {
+  ['blockMode', 'langMode', 'funMode'].forEach(id => {
+    const el = document.getElementById(id);
+    chrome.storage.local.get(id, data => {
+      el.checked = data[id] ?? (id === 'blockMode');
+    });
+    el.addEventListener('change', () => {
+      chrome.storage.local.set({ [id]: el.checked });
+    });
+  });
 });
