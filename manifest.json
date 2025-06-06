@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Remember No Russian",
+  "version": "1.5",
+  "description": "Test version focused on hiding Yandex results from search engines.",
+  "permissions": ["declarativeNetRequest", "declarativeNetRequestWithHostAccess", "storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://www.google.com/search*",
+        "*://www.google.ca/search*",
+        "*://www.google.co.uk/search*",
+        "*://duckduckgo.com/*",
+        "*://search.brave.com/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "block-russian-sites",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
+}
