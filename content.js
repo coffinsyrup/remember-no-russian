@@ -1,56 +1,59 @@
-const blocked = ["yandex", "ya.ru"];
+(async function () {
+  const STORAGE_KEYS = {
+    block: "blockMode",
+    lang: "langMode",
+    fun: "funMode"
+  };
 
-function shouldBlockText(text) {
-  return blocked.some(term => text.toLowerCase().includes(term));
-}
-
-function removeGoogleResults() {
-  document.querySelectorAll("div.g, div.MjjYud, div.tF2Cxc").forEach(result => {
-    const link = result.querySelector("a[href]");
-    if (link && shouldBlockText(link.href)) {
-      result.remove();
-    }
+  // Fetch toggles
+  const settings = await new Promise(resolve => {
+    chrome.storage.local.get(Object.values(STORAGE_KEYS), resolve);
   });
 
-  // Remove Google Knowledge Panel (side panel)
-  document.querySelectorAll("#kp-wp-tab-overview, #rhs, .g-blk").forEach(panel => {
-    if (panel.innerText && shouldBlockText(panel.innerText)) {
-      panel.remove();
-    }
-  });
-}
+  // Fetch blocklist from GitHub Pages
+  let blocklist = { domains: [], keywords: [] };
+  try {
+    const res = await fetch("https://coffinsyrup.github.io/remember-no-russian/blocklist.json");
+    blocklist = await res.json();
+  } catch (e) {
+    console.error("Failed to load blocklist:", e);
+  }
 
-function removeDuckDuckGoResults() {
-  document.querySelectorAll("div.result, article[data-testid='result']").forEach(result => {
-    if (shouldBlockText(result.innerText)) {
-      result.remove();
-    }
-  });
+  function shouldBlockText(text) {
+    return blocklist.keywords.some(term => text.toLowerCase().includes(term.toLowerCase()));
+  }
 
-  // Remove DuckDuckGo side panels
-  document.querySelectorAll("#right-sidebar, .module__sidebar, .sidebar-module").forEach(panel => {
-    if (panel.innerText && shouldBlockText(panel.innerText)) {
-      panel.remove();
-    }
-  });
-}
+  function shouldBlockURL(url) {
+    return blocklist.domains.some(domain => url.includes(domain));
+  }
 
-function removeBraveResults() {
-  document.querySelectorAll("div.result, div.result-card, div.snippet-card").forEach(result => {
-    const link = result.querySelector("a[href]");
-    if ((link && shouldBlockText(link.href)) || shouldBlockText(result.innerText)) {
-      result.remove();
-    }
-  });
-}
+  function removeMatchingElements(selectors) {
+    document.querySelectorAll(selectors).forEach(el => {
+      const href = el.querySelector("a[href]")?.href || "";
+      const text = el.innerText || "";
+      if (
+        (settings.block && shouldBlockURL(href)) ||
+        (settings.lang && /[А-Яа-яЁёЫыЭэЖжЪъ]/.test(text)) ||
+        (settings.fun && text.includes("Russia"))
+      ) {
+        el.remove();
+      }
+    });
+  }
 
-function scrub() {
-  const url = window.location.href;
-  if (url.includes("google.")) removeGoogleResults();
-  else if (url.includes("duckduckgo.com")) removeDuckDuckGoResults();
-  else if (url.includes("search.brave.com")) removeBraveResults();
-}
+  function rewriteRussia() {
+    document.body.innerHTML = document.body.innerHTML
+      .replace(/Russia/g, "russia")
+      .replace(/RUSSIA/g, "rUSSIA");
+  }
 
-scrub();
-const observer = new MutationObserver(scrub);
-observer.observe(document.body, { childList: true, subtree: true });
+  function scrub() {
+    removeMatchingElements("div.g, div.MjjYud, div.tF2Cxc, div.result, div.result-card, div.snippet-card, div.card, .So9e7d, .Ww4FFb, .yYlJEf, .S3nF8e");
+    removeMatchingElements("#kp-wp-tab-overview, #rhs, .g-blk, #right-sidebar, .module__sidebar, .sidebar-module");
+    if (settings.fun) rewriteRussia();
+  }
+
+  scrub();
+  const observer = new MutationObserver(scrub);
+  observer.observe(document.body, { childList: true, subtree: true });
+})();
