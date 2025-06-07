@@ -16,6 +16,17 @@
     fun: rawSettings[STORAGE_KEYS.fun] ?? false
   };
 
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'local') return;
+    if (STORAGE_KEYS.block in changes)
+      settings.block = changes[STORAGE_KEYS.block].newValue ?? true;
+    if (STORAGE_KEYS.lang in changes)
+      settings.lang = changes[STORAGE_KEYS.lang].newValue ?? false;
+    if (STORAGE_KEYS.fun in changes)
+      settings.fun = changes[STORAGE_KEYS.fun].newValue ?? false;
+    scrub();
+  });
+
   // Load local blocklist and merge any remote entries
   let blocklist = { domains: [], keywords: [] };
   try {
@@ -38,7 +49,14 @@
   }
 
   function shouldBlockURL(url) {
-    return blocklist.domains.some(domain => url.includes(domain));
+    try {
+      const hostname = new URL(url).hostname.toLowerCase();
+      return blocklist.domains.some(domain =>
+        hostname === domain || hostname.endsWith('.' + domain)
+      );
+    } catch (e) {
+      return false;
+    }
   }
 
   function removeMatchingElements(selectors) {
