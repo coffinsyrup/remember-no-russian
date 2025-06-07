@@ -74,9 +74,18 @@
   }
 
   function rewriteRussia() {
-    document.body.innerHTML = document.body.innerHTML
-      .replace(/\bRUSSIA\b/g, "rUSSIA")
-      .replace(/\bRussia\b/g, "russia");
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+      null,
+      false
+    );
+    let node;
+    while ((node = walker.nextNode())) {
+      node.nodeValue = node.nodeValue
+        .replace(/\bRUSSIA\b/g, "rUSSIA")
+        .replace(/\bRussia\b/g, "russia");
+    }
   }
 
   function scrub() {
