@@ -43,8 +43,8 @@
 
   function rewriteRussia() {
     document.body.innerHTML = document.body.innerHTML
-      .replace(/Russia/g, "russia")
-      .replace(/RUSSIA/g, "rUSSIA");
+      .replace(/Russia/g, "russia")
+      .replace(/RUSSIA/g, "rUSSIA");
   }
 
   function scrub() {
@@ -57,3 +57,4 @@
   const observer = new MutationObserver(scrub);
   observer.observe(document.body, { childList: true, subtree: true });
 })();
+
