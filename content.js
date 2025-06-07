@@ -16,13 +16,21 @@
     fun: rawSettings[STORAGE_KEYS.fun] ?? false
   };
 
-  // Fetch blocklist from GitHub Pages
+  // Load local blocklist and merge any remote entries
   let blocklist = { domains: [], keywords: [] };
   try {
-    const res = await fetch("https://coffinsyrup.github.io/remember-no-russian/blocklist.json");
-    blocklist = await res.json();
+    const localRes = await fetch(chrome.runtime.getURL("blocklist.json"));
+    blocklist = await localRes.json();
   } catch (e) {
-    console.error("Failed to load blocklist:", e);
+    console.error("Failed to load local blocklist:", e);
+  }
+  try {
+    const res = await fetch("https://coffinsyrup.github.io/remember-no-russian/blocklist.json");
+    const remote = await res.json();
+    blocklist.domains = Array.from(new Set([...blocklist.domains, ...remote.domains]));
+    blocklist.keywords = Array.from(new Set([...blocklist.keywords, ...remote.keywords]));
+  } catch (e) {
+    console.error("Failed to load remote blocklist:", e);
   }
 
   function shouldBlockText(text) {
@@ -39,8 +47,8 @@
       const text = el.innerText || "";
       if (
         (settings.block && shouldBlockURL(href)) ||
-        (settings.lang && /[А-Яа-яЁёЫыЭэЖжЪъ]/.test(text)) ||
-        (settings.fun && text.includes("Russia"))
+        (settings.lang && /[АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя]/.test(text)) ||
+        (settings.fun && /\bRussia\b/i.test(text))
       ) {
         el.remove();
       }
@@ -49,8 +57,8 @@
 
   function rewriteRussia() {
     document.body.innerHTML = document.body.innerHTML
-      .replace(/Russia/g, "russia")
-      .replace(/RUSSIA/g, "rUSSIA");
+      .replace(/\bRUSSIA\b/g, "rUSSIA")
+      .replace(/\bRussia\b/g, "russia");
   }
 
   function scrub() {

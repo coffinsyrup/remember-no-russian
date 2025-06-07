@@ -4,16 +4,15 @@
 
 ## 🔥 Features
 
-- Blocks known Russian domains like `yandex.ru`, `vk.com`, `mail.ru`, `ya.ru`, etc.
-- Scrubs mentions of Russian services from Google, DuckDuckGo, and Brave Search
+- One click **ON/OFF** button to hide Russian domains
+- Optional **Turbo Mode** to remove Russian text from results
+- **rUSSIA Mode** rewrites the word "Russia" for humorous protest
 - Detects Yandex side panels and hides them from search result pages
 - Fully client-side — no data collection, no trackers, no nonsense
 
 ## ⚙️ Coming Soon
 
-- "Russian Language Mode" — removes results containing Russian text
-- "rUSSIA Mode" — rewrites the word "Russia" for humorous protest
-- Custom UI and dynamic blocklist updates from GitHub
+- Dynamic blocklist updates from GitHub
 
 ## 🛠 How to Install
 
