@@ -6,9 +6,15 @@
   };
 
   // Fetch toggles
-  const settings = await new Promise(resolve => {
+  const rawSettings = await new Promise(resolve => {
     chrome.storage.local.get(Object.values(STORAGE_KEYS), resolve);
   });
+
+  const settings = {
+    block: rawSettings[STORAGE_KEYS.block] ?? true,
+    lang: rawSettings[STORAGE_KEYS.lang] ?? false,
+    fun: rawSettings[STORAGE_KEYS.fun] ?? false
+  };
 
   // Fetch blocklist from GitHub Pages
   let blocklist = { domains: [], keywords: [] };
