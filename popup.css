@@ -1,0 +1,45 @@
+:root {
+  --bg: #000000;
+  --accent: #CC0000;
+  --text: #ffffff;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  width: 250px;
+  padding: 16px;
+  margin: 0;
+}
+
+h3 {
+  color: var(--accent);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+#toggleBtn {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  color: var(--text);
+  background-color: var(--accent);
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: var(--accent);
+}
