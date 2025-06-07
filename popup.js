@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateButton(on) {
     toggleBtn.dataset.on = on;
     toggleBtn.textContent = on ? 'ON' : 'OFF';
-    toggleBtn.style.backgroundColor = on ? '#4caf50' : '#ccc';
+    toggleBtn.style.backgroundColor = on ? '#CC0000' : '#333';
+    toggleBtn.style.color = '#ffffff';
   }
 });
